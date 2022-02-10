@@ -1,7 +1,7 @@
-﻿using static JsonDiffer.Tests.Data.SampleJsonData;
-using Newtonsoft.Json.Linq;
+﻿using Newtonsoft.Json.Linq;
 using System;
 using Xunit;
+using static JsonDiffer.Tests.Data.SampleJsonData;
 
 namespace JsonDiffer.Tests
 {
@@ -19,6 +19,20 @@ namespace JsonDiffer.Tests
 
             // assert
             Assert.StartsWith("*", (diff.First as JProperty).Name);
+        }
+
+        [Fact]
+        public void Modified_properties_should_prefixed_with_no_symbol()
+        {
+            // setup
+            var j1 = JToken.Parse("{'id':1, 'foo':'bar'}");
+            var j2 = JToken.Parse("{'id':1, 'foo':'baz'}");
+
+            // act
+            var diff = JsonDifferentiator.Differentiate(j1, j2, OutputMode.None);
+
+            // assert
+            Assert.StartsWith("foo", (diff.First as JProperty).Name);
         }
 
         [Fact]
@@ -47,6 +61,20 @@ namespace JsonDiffer.Tests
 
             // assert
             Assert.StartsWith("-", (diff.First as JProperty).Name);
+        }
+
+        [Fact]
+        public void Diff_with_empty_results_in_complete()
+        {
+            // setup
+            var j1 = JToken.Parse("{}");
+            var j2 = JToken.Parse("{'id':1, 'foo':'bar'}");
+
+            // act
+            var diff = JsonDifferentiator.Differentiate(j1, j2, OutputMode.None);
+
+            // assert
+            Assert.Equal("{\r\n  \"id\": 1,\r\n  \"foo\": \"bar\"\r\n}", diff.ToString());
         }
 
         [Fact]
@@ -253,7 +281,7 @@ namespace JsonDiffer.Tests
             var j2 = JToken.Parse("{'id':1 }");
 
             // act
-            var diff = JsonDifferentiator.Differentiate(j1, j2, OutputMode.Detailed, true, "***");
+            var diff = JsonDifferentiator.Differentiate(j1, j2, OutputMode.Detailed, true, new() { "foo" });
 
             // assert
             Assert.Equal(JToken.Parse("{ 'removed': {'foo': '***'}}"), diff);
@@ -268,7 +296,7 @@ namespace JsonDiffer.Tests
             var j2 = JToken.Parse("{'id':1 }");
 
             // act
-            var diff = JsonDifferentiator.Differentiate(j1, j2, OutputMode.Detailed, false, "***");
+            var diff = JsonDifferentiator.Differentiate(j1, j2, OutputMode.Detailed, false, new() { });
 
             // assert
             Assert.Equal(JToken.Parse("{ 'removed': {'foo': '***'}}"), diff);
@@ -313,7 +341,7 @@ namespace JsonDiffer.Tests
             var j2 = JToken.Parse("{ 'Using': [ 'Serilog.Sinks.File', 'Serilog.Expressions' ], 'Filter': [ { 'Args': { 'expression': 'EventId.Id in [2000]' } } ], 'MinimumLevel': { 'Default': 'Information CHANGED' }, 'WriteTo': [ { 'Name': 'File', 'Args': { 'path': 'audit.log', 'rollingInterval': 'Day', 'shared': false, 'formatter': 'Serilog.Formatting.Json.JsonFormatter, Serilog CHANGED' } } ], 'Enrich': [ 'FromLogContext' ], 'Properties': { 'Application': 'concrii' } }");
 
             // act
-            var diff = JsonDifferentiator.Differentiate(j1, j2, OutputMode.Symbol, true, "***");
+            var diff = JsonDifferentiator.Differentiate(j1, j2, OutputMode.Symbol, true, new() { "Name", "Default", "shared", "formatter" });
 
             // assert
             Assert.Equal("{\r\n  \"*Filter\": [\r\n    {\r\n      \"-Name\": \"***\"\r\n    }\r\n  ],\r\n  \"*MinimumLevel\": {\r\n    \"*Default\": \"***\"\r\n  },\r\n  \"*WriteTo\": [\r\n    {\r\n      \"*Args\": {\r\n        \"*shared\": \"***\",\r\n        \"*formatter\": \"***\"\r\n      }\r\n    }\r\n  ]\r\n}", diff.ToString());
@@ -328,7 +356,7 @@ namespace JsonDiffer.Tests
             var j2 = JToken.Parse("{ 'Using': [ 'Serilog.Sinks.File', 'Serilog.Expressions' ], 'Filter': [ { 'Args': { 'expression': 'EventId.Id in [2000]' } } ], 'MinimumLevel': { 'Default': 'Information CHANGED' }, 'WriteTo': [ { 'Name': 'File', 'Args': { 'path': 'audit.log', 'rollingInterval': 'Day', 'shared': false, 'formatter': 'Serilog.Formatting.Json.JsonFormatter, Serilog CHANGED' } } ], 'Enrich': [ 'FromLogContext' ], 'Properties': { 'Application': 'concrii' } }");
 
             // act
-            var diff = JsonDifferentiator.Differentiate(j1, j2, OutputMode.Symbol, false, "***");
+            var diff = JsonDifferentiator.Differentiate(j1, j2, OutputMode.Symbol, false, new() { });
 
             // assert
             Assert.Equal("{\r\n  \"*Filter\": [\r\n    {\r\n      \"-Name\": \"***\"\r\n    }\r\n  ],\r\n  \"*MinimumLevel\": {\r\n    \"*Default\": \"***\"\r\n  },\r\n  \"*WriteTo\": [\r\n    {\r\n      \"*Args\": {\r\n        \"*shared\": \"***\",\r\n        \"*formatter\": \"***\"\r\n      }\r\n    }\r\n  ]\r\n}", diff.ToString());

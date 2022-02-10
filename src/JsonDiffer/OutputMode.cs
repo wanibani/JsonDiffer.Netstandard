@@ -3,6 +3,7 @@
     public enum OutputMode
     {
         Symbol,
-        Detailed
+        Detailed,
+        None
     }
 }
