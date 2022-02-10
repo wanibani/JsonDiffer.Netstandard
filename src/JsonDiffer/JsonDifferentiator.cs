@@ -8,11 +8,13 @@ namespace JsonDiffer
     {
         public OutputMode OutputMode { get; private set; }
         public bool ShowOriginalValues { get; private set; }
+        public string ReplaceValues { get; private set; }
 
-        public JsonDifferentiator(OutputMode outputMode, bool showOriginalValues)
+        public JsonDifferentiator(OutputMode outputMode, bool showOriginalValues, string replaceValues)
         {
             this.OutputMode = outputMode;
             this.ShowOriginalValues = showOriginalValues;
+            this.ReplaceValues = replaceValues;
         }
 
         private static TargetNode PointTargetNode(JToken diff, string property, ChangeMode mode, OutputMode outMode)
@@ -159,17 +161,17 @@ namespace JsonDiffer
                     var firstsItem = first[property];
                     var secondsItem = second[property];
 
-                    var diffrence = Differentiate(firstsItem, secondsItem, outputMode, showOriginalValues);
+                    var difference2 = Differentiate(firstsItem, secondsItem, outputMode, showOriginalValues, replaceValues);
 
-                    if (diffrence != null)
+                    if (difference2 != null)
                     {
 
                         if (targetNode.Property != null)
                         {
-                            difference[targetNode.Symbol][targetNode.Property] = diffrence;
+                            difference[targetNode.Symbol][targetNode.Property] = difference2;
                         }
                         else
-                            difference[targetNode.Symbol] = diffrence;
+                            difference[targetNode.Symbol] = difference2;
 
                     }
 
@@ -178,7 +180,7 @@ namespace JsonDiffer
 
                 if (first?[property] is JArray)
                 {
-                    var difrences = new JArray();
+                    var differences = new JArray();
 
                     var targetNode = second?[property] == null
                        ? PointTargetNode(difference, property, ChangeMode.Removed, outputMode)
@@ -191,22 +193,22 @@ namespace JsonDiffer
                         var firstsItem = first[property]?.ElementAtOrDefault(i);
                         var secondsItem = second[property]?.ElementAtOrDefault(i);
 
-                        var diff = Differentiate(firstsItem, secondsItem, outputMode, showOriginalValues);
+                        var diff = Differentiate(firstsItem, secondsItem, outputMode, showOriginalValues, replaceValues);
 
                         if (diff != null)
                         {
-                            difrences.Add(diff);
+                            differences.Add(diff);
                         }
                     }
 
-                    if (difrences.HasValues)
+                    if (differences.HasValues)
                     {
                         if (targetNode.Property != null)
                         {
-                            difference[targetNode.Symbol][targetNode.Property] = difrences;
+                            difference[targetNode.Symbol][targetNode.Property] = differences;
                         }
                         else
-                            difference[targetNode.Symbol] = difrences;
+                            difference[targetNode.Symbol] = differences;
                     }
 
                     continue;
@@ -218,7 +220,7 @@ namespace JsonDiffer
 
         public JToken Differentiate(JToken first, JToken second)
         {
-            return Differentiate(first, second, this.OutputMode, this.ShowOriginalValues);
+            return Differentiate(first, second, this.OutputMode, this.ShowOriginalValues, this.ReplaceValues);
         }
     }
 }

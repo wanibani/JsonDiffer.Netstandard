@@ -5,7 +5,7 @@
     <GeneratePackageOnBuild>true</GeneratePackageOnBuild>
     <AssemblyVersion>1.0.0.1</AssemblyVersion>
     <FileVersion>1.0.0.1</FileVersion>
-    <Version>1.0.1</Version>
+    <Version>1.1.0</Version>
     <PackageLicenseFile>LICENSE</PackageLicenseFile>
     <PackageRequireLicenseAcceptance>true</PackageRequireLicenseAcceptance>
     <PackageIcon>icon.PNG</PackageIcon>
@@ -14,7 +14,7 @@
 Detailed object models groups changes in three properties: changed, added and removed.
 This library uses Newtonsoft.Json as the underlying engine.
 Note: Legacy version should work as they did before thanks to optional parameters added to the new functionalities. </Description>
-    <Authors>Amin M</Authors>
+    <Authors>BizconAG</Authors>
     <Company />
 	  <PackageProjectUrl>https://github.com/aminm-net/JsonDiffer.Netstandard</PackageProjectUrl>
   </PropertyGroup>

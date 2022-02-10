@@ -273,5 +273,65 @@ namespace JsonDiffer.Tests
             // assert
             Assert.Equal(JToken.Parse("{ 'removed': {'foo': '***'}}"), diff);
         }
+
+        // new object model tests, we need more tests to be added
+        [Fact]
+        public void Complex_diff_result_when_originalvalues_true()
+        {
+            // setup
+            var j1 = JToken.Parse("{ 'Using': [ 'Serilog.Sinks.File', 'Serilog.Expressions' ], 'Filter': [ { 'Name': 'ByExcluding', 'Args': { 'expression': 'EventId.Id in [2000]' } } ], 'MinimumLevel': { 'Default': 'Information' }, 'WriteTo': [ { 'Name': 'File', 'Args': { 'path': 'audit.log', 'rollingInterval': 'Day', 'shared': true, 'formatter': 'Serilog.Formatting.Json.JsonFormatter, Serilog' } } ], 'Enrich': [ 'FromLogContext' ], 'Properties': { 'Application': 'concrii' } }");
+            var j2 = JToken.Parse("{ 'Using': [ 'Serilog.Sinks.File', 'Serilog.Expressions' ], 'Filter': [ { 'Args': { 'expression': 'EventId.Id in [2000]' } } ], 'MinimumLevel': { 'Default': 'Information CHANGED' }, 'WriteTo': [ { 'Name': 'File', 'Args': { 'path': 'audit.log', 'rollingInterval': 'Day', 'shared': false, 'formatter': 'Serilog.Formatting.Json.JsonFormatter, Serilog CHANGED' } } ], 'Enrich': [ 'FromLogContext' ], 'Properties': { 'Application': 'concrii' } }");
+
+            // act
+            var diff = JsonDifferentiator.Differentiate(j1, j2, OutputMode.Symbol, true);
+
+            // assert
+            Assert.Equal("{\r\n  \"*Filter\": [\r\n    {\r\n      \"-Name\": \"ByExcluding\"\r\n    }\r\n  ],\r\n  \"*MinimumLevel\": {\r\n    \"*Default\": \"Information CHANGED\"\r\n  },\r\n  \"*WriteTo\": [\r\n    {\r\n      \"*Args\": {\r\n        \"*shared\": false,\r\n        \"*formatter\": \"Serilog.Formatting.Json.JsonFormatter, Serilog CHANGED\"\r\n      }\r\n    }\r\n  ]\r\n}", diff.ToString());
+        }
+
+        // new object model tests, we need more tests to be added
+        [Fact]
+        public void Complex_diff_result_when_originalvalues_false()
+        {
+            // setup
+            var j1 = JToken.Parse("{ 'Using': [ 'Serilog.Sinks.File', 'Serilog.Expressions' ], 'Filter': [ { 'Name': 'ByExcluding', 'Args': { 'expression': 'EventId.Id in [2000]' } } ], 'MinimumLevel': { 'Default': 'Information' }, 'WriteTo': [ { 'Name': 'File', 'Args': { 'path': 'audit.log', 'rollingInterval': 'Day', 'shared': true, 'formatter': 'Serilog.Formatting.Json.JsonFormatter, Serilog' } } ], 'Enrich': [ 'FromLogContext' ], 'Properties': { 'Application': 'concrii' } }");
+            var j2 = JToken.Parse("{ 'Using': [ 'Serilog.Sinks.File', 'Serilog.Expressions' ], 'Filter': [ { 'Args': { 'expression': 'EventId.Id in [2000]' } } ], 'MinimumLevel': { 'Default': 'Information CHANGED' }, 'WriteTo': [ { 'Name': 'File', 'Args': { 'path': 'audit.log', 'rollingInterval': 'Day', 'shared': false, 'formatter': 'Serilog.Formatting.Json.JsonFormatter, Serilog CHANGED' } } ], 'Enrich': [ 'FromLogContext' ], 'Properties': { 'Application': 'concrii' } }");
+
+            // act
+            var diff = JsonDifferentiator.Differentiate(j1, j2, OutputMode.Symbol, false);
+
+            // assert
+            Assert.Equal("{\r\n  \"*Filter\": [\r\n    {\r\n      \"-Name\": \"ByExcluding\"\r\n    }\r\n  ],\r\n  \"*MinimumLevel\": {\r\n    \"*Default\": \"Information\"\r\n  },\r\n  \"*WriteTo\": [\r\n    {\r\n      \"*Args\": {\r\n        \"*shared\": true,\r\n        \"*formatter\": \"Serilog.Formatting.Json.JsonFormatter, Serilog\"\r\n      }\r\n    }\r\n  ]\r\n}", diff.ToString());
+        }
+
+        // new object model tests, we need more tests to be added
+        [Fact]
+        public void Complex_replacevalues_diff_result_when_originalvalues_true()
+        {
+            // setup
+            var j1 = JToken.Parse("{ 'Using': [ 'Serilog.Sinks.File', 'Serilog.Expressions' ], 'Filter': [ { 'Name': 'ByExcluding', 'Args': { 'expression': 'EventId.Id in [2000]' } } ], 'MinimumLevel': { 'Default': 'Information' }, 'WriteTo': [ { 'Name': 'File', 'Args': { 'path': 'audit.log', 'rollingInterval': 'Day', 'shared': true, 'formatter': 'Serilog.Formatting.Json.JsonFormatter, Serilog' } } ], 'Enrich': [ 'FromLogContext' ], 'Properties': { 'Application': 'concrii' } }");
+            var j2 = JToken.Parse("{ 'Using': [ 'Serilog.Sinks.File', 'Serilog.Expressions' ], 'Filter': [ { 'Args': { 'expression': 'EventId.Id in [2000]' } } ], 'MinimumLevel': { 'Default': 'Information CHANGED' }, 'WriteTo': [ { 'Name': 'File', 'Args': { 'path': 'audit.log', 'rollingInterval': 'Day', 'shared': false, 'formatter': 'Serilog.Formatting.Json.JsonFormatter, Serilog CHANGED' } } ], 'Enrich': [ 'FromLogContext' ], 'Properties': { 'Application': 'concrii' } }");
+
+            // act
+            var diff = JsonDifferentiator.Differentiate(j1, j2, OutputMode.Symbol, true, "***");
+
+            // assert
+            Assert.Equal("{\r\n  \"*Filter\": [\r\n    {\r\n      \"-Name\": \"***\"\r\n    }\r\n  ],\r\n  \"*MinimumLevel\": {\r\n    \"*Default\": \"***\"\r\n  },\r\n  \"*WriteTo\": [\r\n    {\r\n      \"*Args\": {\r\n        \"*shared\": \"***\",\r\n        \"*formatter\": \"***\"\r\n      }\r\n    }\r\n  ]\r\n}", diff.ToString());
+        }
+
+        // new object model tests, we need more tests to be added
+        [Fact]
+        public void Complex_replacevalues_diff_result_when_originalvalues_false()
+        {
+            // setup
+            var j1 = JToken.Parse("{ 'Using': [ 'Serilog.Sinks.File', 'Serilog.Expressions' ], 'Filter': [ { 'Name': 'ByExcluding', 'Args': { 'expression': 'EventId.Id in [2000]' } } ], 'MinimumLevel': { 'Default': 'Information' }, 'WriteTo': [ { 'Name': 'File', 'Args': { 'path': 'audit.log', 'rollingInterval': 'Day', 'shared': true, 'formatter': 'Serilog.Formatting.Json.JsonFormatter, Serilog' } } ], 'Enrich': [ 'FromLogContext' ], 'Properties': { 'Application': 'concrii' } }");
+            var j2 = JToken.Parse("{ 'Using': [ 'Serilog.Sinks.File', 'Serilog.Expressions' ], 'Filter': [ { 'Args': { 'expression': 'EventId.Id in [2000]' } } ], 'MinimumLevel': { 'Default': 'Information CHANGED' }, 'WriteTo': [ { 'Name': 'File', 'Args': { 'path': 'audit.log', 'rollingInterval': 'Day', 'shared': false, 'formatter': 'Serilog.Formatting.Json.JsonFormatter, Serilog CHANGED' } } ], 'Enrich': [ 'FromLogContext' ], 'Properties': { 'Application': 'concrii' } }");
+
+            // act
+            var diff = JsonDifferentiator.Differentiate(j1, j2, OutputMode.Symbol, false, "***");
+
+            // assert
+            Assert.Equal("{\r\n  \"*Filter\": [\r\n    {\r\n      \"-Name\": \"***\"\r\n    }\r\n  ],\r\n  \"*MinimumLevel\": {\r\n    \"*Default\": \"***\"\r\n  },\r\n  \"*WriteTo\": [\r\n    {\r\n      \"*Args\": {\r\n        \"*shared\": \"***\",\r\n        \"*formatter\": \"***\"\r\n      }\r\n    }\r\n  ]\r\n}", diff.ToString());
+        }
     }
 }
