@@ -43,7 +43,7 @@ namespace JsonDiffer
 
         }
 
-        public static JToken Differentiate(JToken first, JToken second, OutputMode outputMode = OutputMode.Symbol, bool showOriginalValues = false)
+        public static JToken Differentiate(JToken first, JToken second, OutputMode outputMode = OutputMode.Symbol, bool showOriginalValues = false, string replaceValues = "")
         {
             if (JToken.DeepEquals(first, second)) return null;
 
@@ -78,7 +78,7 @@ namespace JsonDiffer
                             var firstsItem = first?.ElementAtOrDefault(i);
                             var secondsItem = second?.ElementAtOrDefault(i);
 
-                            var diff = Differentiate(firstsItem, secondsItem, outputMode, showOriginalValues);
+                            var diff = Differentiate(firstsItem, secondsItem, outputMode, showOriginalValues, replaceValues);
 
                             if (diff != null)
                             {
@@ -107,10 +107,10 @@ namespace JsonDiffer
 
                     if (targetNode.Property != null)
                     {
-                        difference[targetNode.Symbol][targetNode.Property] = secondVal.Value;
+                        difference[targetNode.Symbol][targetNode.Property] = !string.IsNullOrEmpty(replaceValues) ? replaceValues : secondVal.Value;
                     }
                     else
-                        difference[targetNode.Symbol] = secondVal.Value;
+                        difference[targetNode.Symbol] = !string.IsNullOrEmpty(replaceValues) ? replaceValues : secondVal.Value;
 
                     continue;
                 }
@@ -123,10 +123,10 @@ namespace JsonDiffer
 
                     if (targetNode.Property != null)
                     {
-                        difference[targetNode.Symbol][targetNode.Property] = firstVal.Value;
+                        difference[targetNode.Symbol][targetNode.Property] = !string.IsNullOrEmpty(replaceValues) ? replaceValues : firstVal.Value;
                     }
                     else
-                        difference[targetNode.Symbol] = firstVal.Value;
+                        difference[targetNode.Symbol] = !string.IsNullOrEmpty(replaceValues) ? replaceValues : firstVal.Value;
 
                     continue;
                 }
@@ -139,10 +139,10 @@ namespace JsonDiffer
 
                         if (targetNode.Property != null)
                         {
-                            difference[targetNode.Symbol][targetNode.Property] = showOriginalValues ? second?[property] : value;
+                            difference[targetNode.Symbol][targetNode.Property] = !string.IsNullOrEmpty(replaceValues) ? replaceValues : showOriginalValues ? second?[property] : value;
                         }
                         else
-                            difference[targetNode.Symbol] = showOriginalValues ? second?[property] : value;
+                            difference[targetNode.Symbol] = !string.IsNullOrEmpty(replaceValues) ? replaceValues : showOriginalValues ? second?[property] : value;
                         //difference["changed"][property] = showOriginalValues ? second?[property] : value;
                     }
 

@@ -48,7 +48,7 @@ namespace JsonDiffer.Tests
             // assert
             Assert.StartsWith("-", (diff.First as JProperty).Name);
         }
-        
+
         [Fact]
         public void Result_should_be_null_when_both_operands_are_empty()
         {
@@ -242,6 +242,36 @@ namespace JsonDiffer.Tests
 
             // assert
             Assert.Equal(JToken.Parse("{ 'removed': {'foo': 'bar'}}"), diff);
+        }
+
+        // new object model tests, we need more tests to be added
+        [Fact]
+        public void Replaced_values_in_diff_result_when_originalvalues_true()
+        {
+            // setup
+            var j1 = JToken.Parse("{'id':1, 'foo':'bar'}");
+            var j2 = JToken.Parse("{'id':1 }");
+
+            // act
+            var diff = JsonDifferentiator.Differentiate(j1, j2, OutputMode.Detailed, true, "***");
+
+            // assert
+            Assert.Equal(JToken.Parse("{ 'removed': {'foo': '***'}}"), diff);
+        }
+
+        // new object model tests, we need more tests to be added
+        [Fact]
+        public void Replaced_values_in_diff_result_when_originalvalues_false()
+        {
+            // setup
+            var j1 = JToken.Parse("{'id':1, 'foo':'bar'}");
+            var j2 = JToken.Parse("{'id':1 }");
+
+            // act
+            var diff = JsonDifferentiator.Differentiate(j1, j2, OutputMode.Detailed, false, "***");
+
+            // assert
+            Assert.Equal(JToken.Parse("{ 'removed': {'foo': '***'}}"), diff);
         }
     }
 }
