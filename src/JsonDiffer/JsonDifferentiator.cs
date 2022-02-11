@@ -52,7 +52,7 @@ namespace JsonDiffer
             if (
                 default != hidePropertyValues &&
                 !string.IsNullOrEmpty(property) &&
-                (hidePropertyValues.Contains(property) || !hidePropertyValues.Any()))
+                (hidePropertyValues.Contains(property, StringComparer.OrdinalIgnoreCase) || !hidePropertyValues.Any()))
             {
                 value = HiddenValue;
             }
